@@ -7,6 +7,6 @@ MarkupSafe==1.0
 Werkzeug==0.14.1
 
 # Custom
-requests=2.22.0
-six=1.13.0
+requests==2.22.0
+six==1.13.0
 authlib
