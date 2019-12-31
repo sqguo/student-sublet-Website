@@ -1,0 +1,17 @@
+{% extends "boilerplate.html" %}
+
+<!-- SEO Info Starts -->
+{% set seo_title = "Dashboard" %}
+{% set seo_canonical = url_for('main.user_dashboard') %}
+{% set seo_description = "Dashboard description" %}
+<!-- SEO Info Ends -->
+
+<!-- Body Content Starts -->
+{% block content %}
+  <h1>Dashboard</h1>
+  <a href="/auth/logout">Logout</a>
+{% endblock %}
+
+{% block footer_scripts %}
+{% endblock %}
+<!-- Body Content Ends -->

@@ -1,0 +1,17 @@
+{% extends "boilerplate.html" %}
+
+<!-- SEO Info Starts -->
+{% set seo_title = "Homepage" %}
+{% set seo_canonical = url_for('main.home') %}
+{% set seo_description = "Homepage description" %}
+<!-- SEO Info Ends -->
+
+<!-- Body Content Starts -->
+{% block content %}
+  <h1>Home</h1>
+  <a href="/auth/login">Login</a>
+{% endblock %}
+
+{% block footer_scripts %}
+{% endblock %}
+<!-- Body Content Ends -->
