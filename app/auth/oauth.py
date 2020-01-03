@@ -39,10 +39,7 @@ def requires_auth(f):
 
 @bp.route('/login')
 def login():
-    return auth0.authorize_redirect(
-        redirect_uri=current_app.config['BASE_URL']
-        + url_for('.oathu_callback_handling')
-    )
+    return auth0.authorize_redirect(redirect_uri=current_app.config['BASE_URL']+url_for('.oathu_callback_handling'))
 
 
 @bp.route('/callback')

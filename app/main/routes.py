@@ -12,12 +12,6 @@ def home():
     return render_template('home.html')
 
 
-@bp.route("/countusers")
-def count_users():
-    num = User.query.count()
-    return str(num)
-
-
 @bp.route('/user/dashboard')
 @requires_auth
 def user_dashboard():
