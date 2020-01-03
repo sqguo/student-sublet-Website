@@ -13,7 +13,7 @@ class Config(object):
     AZ_SQLDB_UID = os.environ['AZ_SQLDB_UID']
     AZ_SQLDB_PWD = os.environ['AZ_SQLDB_PWD']
 
-    AZ_SQLDB_PARAM = parse.quote_plus('Driver={ODBC Driver 17 for SQL Server};'
+    AZ_SQLDB_PARAM = parse.quote_plus('Driver={ODBC Driver 13 for SQL Server};'
                                       + 'Server=tcp:' + AZ_SQLDB_NAME
                                       + '.database.windows.net,1433;'
                                       + 'Database=' + AZ_SQLDB_NAME
