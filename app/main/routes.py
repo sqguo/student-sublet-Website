@@ -1,13 +1,16 @@
 from flask import render_template
 from flask import redirect
-from flask import session
 from flask import url_for
+from app import db
 from app.main import bp
+from app.models import User
 from app.auth.oauth import requires_auth
+
 
 @bp.route("/")
 def home():
     return render_template('home.html')
+
 
 @bp.route('/user/dashboard')
 @requires_auth

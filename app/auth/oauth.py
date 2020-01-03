@@ -10,6 +10,8 @@ from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 
 from app.auth import bp
+from app import db
+from app.models import User
 
 oauth = OAuth(current_app)
 
@@ -25,6 +27,7 @@ auth0 = oauth.register(
     },
 )
 
+
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -33,15 +36,23 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
+
 @bp.route('/login')
 def login():
     return auth0.authorize_redirect(redirect_uri=current_app.config['BASE_URL']+url_for('.oathu_callback_handling'))
+
 
 @bp.route('/callback')
 def oathu_callback_handling():
     oauth.auth0.authorize_access_token()
     resp = oauth.auth0.get('userinfo')
     userinfo = resp.json()
+
+    if db.session.query(User.id).filter_by(id=userinfo['sub']).scalar() is None:
+        user = User(userinfo['sub'], username=userinfo['name'],
+                    email=userinfo['email'], profileimg=userinfo['picture'])
+        db.session.add(user)
+        db.session.commit()
 
     session['jwt_payload'] = userinfo
     session['user_profile'] = {
@@ -50,6 +61,7 @@ def oathu_callback_handling():
         'user_picture': userinfo['picture']
     }
     return redirect(url_for('main.user_dashboard'))
+
 
 @bp.route('/logout')
 def logout():
