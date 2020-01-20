@@ -1,4 +1,5 @@
 from flask import render_template
+from flask import current_app
 from flask import redirect
 from flask import url_for
 from app import db
@@ -9,7 +10,8 @@ from app.auth.oauth import requires_auth
 
 @bp.route("/")
 def home():
-    return render_template('home.html')
+    mapbox_token = current_app.config['MAPBOX_PUBLIC_TOKEN']
+    return render_template('home.html', mapbox_token=mapbox_token)
 
 
 @bp.route('/user/dashboard')

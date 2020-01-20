@@ -25,3 +25,5 @@ class Config(object):
 
     SQLALCHEMY_DATABASE_URI = "mssql+pyodbc:///?odbc_connect=%s" % AZ_SQLDB_PARAM
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    MAPBOX_PUBLIC_TOKEN = os.environ['MAPBOX_PUBLIC_TOKEN']

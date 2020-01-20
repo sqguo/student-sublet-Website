@@ -6,10 +6,25 @@
 {% set seo_description = "Homepage description" %}
 <!-- SEO Info Ends -->
 
+{% block header %}
+<script src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+{% endblock %}
+
 <!-- Body Content Starts -->
 {% block content %}
-  <h1>Home</h1>
-  <a href="/auth/login">Login</a>
+<h1>Home</h1>
+<a href="/auth/login">Login</a>
+<div id='map' style='width: 400px; height: 300px;' data-publictoken={{mapbox_token}}></div>
+<script>
+  const map_bounds = [[-80.594071, 43.394077],[-80.398350, 43.520287]];
+  mapboxgl.accessToken = document.getElementById('map').dataset.publictoken;
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    bounds: map_bounds
+  });
+</script>
 {% endblock %}
 
 {% block footer_scripts %}
