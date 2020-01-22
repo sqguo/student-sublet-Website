@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from config import Config
 
 db = SQLAlchemy()
-migrate = Migrate()
+migrate = Migrate(compare_type=True)
 
 
 def creat_app(config=Config):
@@ -24,6 +24,9 @@ def creat_app(config=Config):
 
     from app.ancillary import bp as ancillary_bp
     app.register_blueprint(ancillary_bp)
+
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     app.secret_key = Config.APP_SECRET
 

@@ -10,11 +10,12 @@ class User(db.Model):
     email = db.Column(db.String(120))
     profileimg = db.Column(db.String(200))
     verifiedstu = db.Column(db.Boolean)
-    datecreated = db.Column(db.String(50))
+    datecreated = db.Column(db.DateTime)
     trustscore = db.Column(db.Integer)
+    anonymous = db.Column(db.Boolean)
 
     def __init__(self, id, username=None, email=None, profileimg=None,
-                 verifiedstu=False, trustscore=1):
+                 anonymous=True, verifiedstu=False, trustscore=1):
         self.id = id
         self.username = username
         self.email = email
@@ -22,6 +23,7 @@ class User(db.Model):
         self.verifiedstu = verifiedstu
         self.datecreated = datetime.utcnow()
         self.trustscore = trustscore
+        self.anonymous = anonymous
 
     def __repr__(self):
         return '<User {}>'.format(self.id)
@@ -38,6 +40,23 @@ class User(db.Model):
     def set_trustscore(self, trustscore):
         self.trustscore = trustscore
 
+    def set_anonymity(self, anonymous):
+        self.anonymous = anonymous
+
+    @property
+    def serialize(self):
+        if (self.anonymous is True):
+            return {
+                'anonymous': True
+            }
+        return {
+            'username': self.username,
+            'profileimg': self.profileimg,
+            'verifiedstu': self.verifiedstu,
+            'datecreated': self.datecreated,
+            'anonymous': False
+        }
+
 
 class Sublet(db.Model):
 
@@ -46,13 +65,14 @@ class Sublet(db.Model):
     creatorid = db.Column(db.String(100), db.ForeignKey('users.id'))
     datecreated = db.Column(db.DateTime)
     datemodified = db.Column(db.DateTime)
+    # need to add title and address (geoencoding)
     avgrating = db.Column(db.Float)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     profileimg = db.Column(db.String(200))
     description = db.Column(db.String(200))
 
-    def __init__(self, id, creatorid, latitude=None, longitude=None,
+    def __init__(self, creatorid, latitude, longitude,
                  profileimg=None, description=None, avgrating=None):
         self.creatorid = creatorid
         self.latitude = latitude
@@ -60,7 +80,7 @@ class Sublet(db.Model):
         self.avgrating = avgrating
         self.profileimg = profileimg
         self.description = description
-        self.datecreated = datetime.utcnow
+        self.datecreated = datetime.utcnow()
 
     def __repr__(self):
         return '<Sublet {} at {}, {}>'.format(
@@ -71,9 +91,28 @@ class Sublet(db.Model):
 
     def set_description(self, description):
         self.description = description
+        self.datemodified = datetime.utcnow()
+
+    def set_position(self, latitude, longitude):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.datemodified = datetime.utcnow()
 
     def set_profileimg(self, profileimg):
         self.profileimg = profileimg
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'datecreated': self.datecreated,
+            'datemodified': self.datemodified,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'description': self.description,
+            'avgrating': self.avgrating,
+            'profileimg': self.profileimg
+        }
 
 
 class Review(db.Model):
@@ -91,18 +130,18 @@ class Review(db.Model):
         self.authorid = authorid
         self.rating = rating
         self.content = content
-        self.datecreated = datetime.utcnow
+        self.datecreated = datetime.utcnow()
 
     def __repr__(self):
         return '<Review {} by {}>'.format(self.id, self.authorid)
 
     def set_content(self, content):
         self.content = content
-        self.datemodified = datetime.utcnow
+        self.datemodified = datetime.utcnow()
 
     def set_rating(self, rating):
         self.rating = rating
-        self.datemodified = datetime.utcnow
+        self.datemodified = datetime.utcnow()
 
 
 class Reply(db.Model):
@@ -119,11 +158,11 @@ class Reply(db.Model):
         self.authorid = authorid
         self.reviewid = reviewid
         self.content = content
-        self.datecreated = datetime.utcnow
+        self.datecreated = datetime.utcnow()
 
     def __repr__(self):
         return '<Review {} by {}>'.format(self.id, self.authorid)
 
     def set_content(self, content):
         self.content = content
-        self.datemodified = datetime.utcnow
+        self.datemodified = datetime.utcnow()

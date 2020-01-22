@@ -37,6 +37,12 @@ def requires_auth(f):
     return decorated
 
 
+def get_current_user():
+    if 'user_profile' in session:
+        return session['user_profile']['user_id']
+    return None
+
+
 @bp.route('/login')
 def login():
     return auth0.authorize_redirect(
