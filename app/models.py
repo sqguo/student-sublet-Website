@@ -65,22 +65,30 @@ class Sublet(db.Model):
     creatorid = db.Column(db.String(100), db.ForeignKey('users.id'))
     datecreated = db.Column(db.DateTime)
     datemodified = db.Column(db.DateTime)
-    # need to add title and address (geoencoding)
+    title = db.Column(db.String(100))
+    address = db.Column(db.String(100))
+    postalcode = db.Column(db.String(6))
     avgrating = db.Column(db.Float)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     profileimg = db.Column(db.String(200))
     description = db.Column(db.String(200))
+    management = db.Column(db.String(30))
 
-    def __init__(self, creatorid, latitude, longitude,
-                 profileimg=None, description=None, avgrating=None):
+    def __init__(self, creatorid, latitude, longitude, title,
+                 address=None, profileimg=None, description=None,
+                 avgrating=None, postalcode=None, management=None):
         self.creatorid = creatorid
+        self.title = title
         self.latitude = latitude
         self.longitude = longitude
+        self.address = address
+        self.postalcode = postalcode
         self.avgrating = avgrating
         self.profileimg = profileimg
         self.description = description
         self.datecreated = datetime.utcnow()
+        self.management = management
 
     def __repr__(self):
         return '<Sublet {} at {}, {}>'.format(
@@ -97,6 +105,18 @@ class Sublet(db.Model):
         self.latitude = latitude
         self.longitude = longitude
         self.datemodified = datetime.utcnow()
+
+    def set_title(self, title):
+        self.title = title
+
+    def set_address(self, address):
+        self.address = address
+
+    def set_postalcode(self, postalcode):
+        self.postalcode = postalcode
+
+    def set_management(self, management):
+        self.management = management
 
     def set_profileimg(self, profileimg):
         self.profileimg = profileimg
