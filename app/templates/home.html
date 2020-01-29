@@ -15,7 +15,9 @@
 {% block content %}
 <h1>Home</h1>
 <a href="/auth/login">Login</a>
+<div id="adsublet_button_container"></div>
 <div id='map' style='width: 400px; height: 300px;' data-publictoken={{mapbox_token}}></div>
+<div id="sublet_list_container"></div>
 <script>
   const map_bounds = [[-80.594071, 43.394077],[-80.398350, 43.520287]];
   mapboxgl.accessToken = document.getElementById('map').dataset.publictoken;
@@ -28,5 +30,6 @@
 {% endblock %}
 
 {% block footer_scripts %}
+  <script src="/static/js/sublet.js" type="text/babel"></script>
 {% endblock %}
 <!-- Body Content Ends -->

@@ -1,18 +1,32 @@
 from flask import request
 from flask import abort
 from flask import jsonify
+from flask import session
 
 from app.api import bp
 from app import db
 from app.models import User, Sublet, Review, Reply
-from app.auth.oauth import requires_auth, get_current_user
+
+from functools import wraps
+
+
+def requires_auth_api(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user_profile' not in session:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated
 
 
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['GET'])
-def get_sublets(sublet_id):
+def get_sublets_by_id(sublet_id):
 
-    if request.json and 'level' in request.json:
-        level = request.json['level']
+    if 'level' in request.args:
+        try:
+            level = int(request.args['level'])
+        except Exception:
+            abort(400)
     else:
         level = 0
 
@@ -31,11 +45,31 @@ def get_sublets(sublet_id):
         abort(400)
 
 
-@requires_auth
+@bp.route('/v0/sublet', methods=['GET'])
+def get_sublets():
+
+    if 'size' in request.args:
+        size = request.args['size']
+    else:
+        size = 10
+
+    if 'page' in request.args:
+        page = request.args['page']
+    else:
+        page = 1
+    data = []
+    sublets = db.session.query(Sublet).order_by(Sublet.id).paginate(int(page), int(size), True).items
+    for sublet in sublets:
+        data.append(sublet.serialize)
+    return jsonify(data)
+
+
 @bp.route('/v0/sublet', methods=['POST'])
+@requires_auth_api
 def post_sublets():
-    creatorid = get_current_user()
+    creatorid = session['user_profile']['user_id']
     if not request.json:
+        print("missing json")
         abort(400)
     if 'title' not in request.json:
         abort(400)
@@ -65,12 +99,12 @@ def post_sublets():
     return jsonify({'sublet': sublet.serialize}), 201
 
 
-@requires_auth
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['PUT'])
+@requires_auth_api
 def update_sublet(sublet_id):
 
     sublet = db.session.query(Sublet).get(sublet_id)
-    req_id = get_current_user()
+    req_id = session['user_profile']['user_id']
     if sublet is None:
         abort(404)
     if sublet.creatorid != req_id:
@@ -96,12 +130,12 @@ def update_sublet(sublet_id):
     return jsonify({'sublet': sublet.serialize}), 201
 
 
-@requires_auth
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['DELETE'])
+@requires_auth_api
 def delete_sublet(sublet_id):
 
     sublet = db.session.query(Sublet).get(sublet_id)
-    req_id = get_current_user()
+    req_id = session['user_profile']['user_id']
     if sublet is None:
         abort(404)
     if sublet.creatorid != req_id:

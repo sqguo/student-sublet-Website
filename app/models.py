@@ -125,6 +125,7 @@ class Sublet(db.Model):
     def serialize(self):
         return {
             'id': self.id,
+            'title': self.title,
             'datecreated': self.datecreated,
             'datemodified': self.datemodified,
             'latitude': self.latitude,
