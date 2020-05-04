@@ -19,6 +19,7 @@ def requires_auth_api(f):
     return decorated
 
 
+# retrieves a single sublet post of matching ID
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['GET'])
 def get_sublets_by_id(sublet_id):
 
@@ -45,6 +46,7 @@ def get_sublets_by_id(sublet_id):
         abort(400)
 
 
+# retrieves multiple sublet posts, currently ordered by ID
 @bp.route('/v0/sublet', methods=['GET'])
 def get_sublets():
 
@@ -64,6 +66,7 @@ def get_sublets():
     return jsonify(data)
 
 
+# adds a new sublet post into the database
 @bp.route('/v0/sublet', methods=['POST'])
 @requires_auth_api
 def post_sublets():
@@ -99,6 +102,7 @@ def post_sublets():
     return jsonify({'sublet': sublet.serialize}), 201
 
 
+# enbles creator to update a single sublet post of matching ID
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['PUT'])
 @requires_auth_api
 def update_sublet(sublet_id):
@@ -130,6 +134,7 @@ def update_sublet(sublet_id):
     return jsonify({'sublet': sublet.serialize}), 201
 
 
+# enbles creator to update a single sublet post of matching ID
 @bp.route('/v0/sublet/<int:sublet_id>', methods=['DELETE'])
 @requires_auth_api
 def delete_sublet(sublet_id):
@@ -145,6 +150,7 @@ def delete_sublet(sublet_id):
     return jsonify({'delete': True})
 
 
+# helper function for validating json request
 def sync_sublet_json(sublet, s_data):
     if 'description' in request.json:
         des = request.json['description']

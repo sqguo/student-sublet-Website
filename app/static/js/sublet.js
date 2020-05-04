@@ -4,106 +4,151 @@ const e = React.createElement;
 
 function SubletPost(props) {
     return (
-        <li className="list-group-item list-group-item-action" onClick={props.onClick}>
+        <li className="list-group-item list-group-item-action" onClick={props.handleClick}>
             <h2>{props.title}</h2> {props.description}
         </li>
     );
 }
 
-class SubletList extends React.Component {
+function RefreshSubletListButton(props) {
+    return <button onClick={props.handleClick}>refresh</button>
+}
+
+function AddSubletPostButton(props) {
+    return <button onClick={props.handleClick}>+</button>
+}
+
+class AddsubletPostInputForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            sublets: Array(0),
-        };
-    }
-
-    handleClick(i) {
-        console.log("clicked", i);
-    }
-
-    renderSubletPost(i) {
-        return (
-            <SubletPost
-                title={this.state.sublets[i]['title']}
-                description={this.state.sublets[i]['description']}
-                onClick={() => this.handleClick(i)}
-            />
-        );
-    }
-    createSubletRows() {
-        let list = [];
-        for (let i = 0; i < this.state.sublets.length; i++) {
-            list.push(this.renderSubletPost(i));
+            postTitle: "",
+            postDescription: "",
         }
-        return list;
-    }
-    refresh() {
-        $.ajax({
-            type: 'GET',
-            url: '/api/v0/sublet',
-            success: function (data) {
-                this.setState({
-                    sublets: data,
-                });
-            }.bind(this),
-            contentType: "application/json",
-        });
+        this.handleAddPostButtonClick = this.handleAddPostButtonClick.bind(this); 
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this); 
+        this.handleTitleChange = this.handleTitleChange.bind(this); 
     }
 
-    render() {
-        return (
-            <div>
-                <AddRefreshButton onClick={() => this.refresh()} />
-                <div className="list-group">
-                    {this.createSubletRows()}
-                </div>
-            </div>
-        );
-    }
-}
-
-class AddSubletButton extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    // replace below !!
-    createSublet() {
+    handleAddPostButtonClick() {
         $.ajax({
             type: 'POST',
             url: '/api/v0/sublet',
             data: JSON.stringify({
+                //testing position
                 'latitude': 11,
                 'longitude': 11,
-                'title': "new test 4 month posting",
-                'description': "new sublet test post description"
+                'title': this.state.title,
+                'description': this.state.description
             }),
             success: function (data) {
+                //testing
+                console.log("post added to database")
                 console.log(data);
-            },
+            }.bind(this),
             contentType: "application/json",
             dataType: 'json'
         });
     }
 
+    handleTitleChange(event) {
+        this.setState({title: event.target.value}); 
+    }
+
+    handleDescriptionChange(event) {
+        this.setState({description: event.target.value}); 
+    }
+
     render() {
-        return e(
-            'button',
-            { onClick: () => this.createSublet() },
-            '+'
+        return (
+            <div>
+                <label>
+                    Title:<br/>
+                    <input type="text" value={this.state.title} onChange={this.handleTitleChange} />
+                    <br/>
+                    Description:<br/>
+                    <textarea value={this.state.description} onChange={this.handleDescriptionChange} />
+                    <br/>
+                </label>
+                <AddSubletPostButton handleClick={this.handleAddPostButtonClick}/>
+            </div>
         );
     }
 }
 
-function AddRefreshButton(props) {
-    return (
-        <button onClick={props.onClick}>
-            refresh
-        </button>
-    );
+class SubletPostList extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return (
+            <div className="list-group">
+                {this.props.subletData.map((sublet, index) =>
+                    <SubletPost
+                        key={sublet['id'].toString()}
+                        title={sublet['title']}
+                        description={sublet['description']}
+                        handleClick={() => this.props.handleClick(index)}
+                    />
+                )}
+            </div>
+        );
+    }
 }
 
-const domContainer = document.querySelector('#adsublet_button_container');
-const domContainer2 = document.querySelector('#sublet_list_container');
-ReactDOM.render(e(AddSubletButton), domContainer);
-ReactDOM.render(e(SubletList), domContainer2);
+class SubletListContainer extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            subletData: Array(0),
+        };
+        this.handleRefreshButtonClick = this.handleRefreshButtonClick.bind(this);
+        this.handleListItemClick = this.handleListItemClick.bind(this);
+    }
+
+    handleRefreshButtonClick() {
+        $.ajax({
+            type: 'GET',
+            url: '/api/v0/sublet',
+            success: function (data) {
+                this.setState({
+                    subletData: data,
+                });
+                //testing
+                console.log("refreshed listing");
+            }.bind(this),
+            contentType: "application/json",
+        });
+    }
+
+    handleListItemClick(index) {
+        //testing
+        console.log("clicked", index);
+        console.log(this.state.subletData[index]);
+    }
+    render() {
+        return (
+            <div class="subletListContainer">
+                <RefreshSubletListButton handleClick={this.handleRefreshButtonClick} />
+                <SubletPostList subletData={this.state.subletData} handleClick={this.handleListItemClick} />
+            </div>
+        );
+    }
+}
+
+function SubletMainInterface(props) {
+    return (
+        <div>
+            <SubletListContainer/>
+            <AddsubletPostInputForm/>
+        </div>
+    )
+}
+
+//should change to single node
+//always capital case for react component, event camelcase
+//never modify own props
+//state =  in constructor, else use set state
+//single source of truth
+const root = document.querySelector('#root');
+ReactDOM.render(e(SubletMainInterface), root);
